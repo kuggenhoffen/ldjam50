@@ -41,20 +41,4 @@ public class Parallax : MonoBehaviour
             transform.position = new Vector3(posX, transform.position.y, transform.position.z);
         }
     }
-
-    void OnDrawGizmos() 
-    {
-        return;    
-        float distance = (transform.position - cam.transform.position).z;
- 
-        float leftBorder = cam.ViewportToWorldPoint (new Vector3 (0, 0, distance)).x - (bounds.size.x * 0.5f);
-        float rightBorder = cam.ViewportToWorldPoint (new Vector3 (0, 0, distance)).x + (bounds.size.x * 0.5f);
-
-        float posX = Mathf.Clamp(transform.position.x, leftBorder - 10f, rightBorder);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(new Vector3(leftBorder, 10f, 0f), new Vector3(leftBorder, -10f, 0f));
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(new Vector3(rightBorder, 10f, 0f), new Vector3(rightBorder, -10f, 0f));
-    }
 }

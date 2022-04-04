@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour
 
     Bounds leftBounds;
     Bounds rightBounds;
-    Camera cam;
+    public Camera cam;
 
     float leftBorder;
     float rightBorder;
@@ -30,8 +30,22 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         float newPosX = target.position.x;
-        newPosX = Mathf.Clamp(newPosX, minX, maxX);
+        //newPosX = Mathf.Clamp(newPosX, minX, maxX);
         transform.position = new Vector3(newPosX, transform.position.y, transform.position.z);
+
+        float distance = (target.position - cam.transform.position).z;
+ 
+        float leftBorder = cam.ViewportToWorldPoint (new Vector3 (0, 0, distance)).x;
+        float rightBorder = cam.ViewportToWorldPoint (new Vector3 (1, 0, distance)).x;
+        float maxLeft = leftBoundObject.transform.position.x - leftBounds.size.x / 2f;
+        float maxRight = rightBoundObject.transform.position.x + rightBounds.size.x / 2f;
+        if (leftBorder < maxLeft) {
+            transform.position = new Vector3(transform.position.x + (maxLeft - leftBorder), transform.position.y, transform.position.z);
+        }
+        if (rightBorder > maxRight) {          
+            Debug.Log(rightBorder + " : " + maxRight);  
+            transform.position = new Vector3(transform.position.x + (maxRight - rightBorder), transform.position.y, transform.position.z);
+        }
 
 /*        float distance = (leftBoundObject.transform.position - cam.transform.position).z;
 
@@ -44,11 +58,17 @@ public class CameraController : MonoBehaviour
 */
     }
 
-    void OnDrawGizmos() 
+    void OnDrawGizmos()
     {
+        float distance = (target.position - cam.transform.position).z;
+ 
+        float leftBorder = cam.ViewportToWorldPoint (new Vector3 (0, 0, distance)).x;
+        float rightBorder = cam.ViewportToWorldPoint (new Vector3 (1, 0, distance)).x;
+
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(new Vector3(leftBorder, 10f, 0f), new Vector3(leftBorder, -10f, 0f));
+        Gizmos.DrawLine(new Vector3(leftBorder, 5f, 0f), new Vector3(leftBorder, -5f, 0f));
         Gizmos.color = Color.green;
-        Gizmos.DrawLine(new Vector3(rightBorder, 10f, 0f), new Vector3(rightBorder, -10f, 0f));
+        Gizmos.DrawLine(new Vector3(rightBorder, 5f, 0f), new Vector3(rightBorder, -5f, 0f));
     }
+
 }
