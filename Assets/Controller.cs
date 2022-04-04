@@ -29,6 +29,9 @@ public class Controller : MonoBehaviour
     void Update()
     {
         scoreText.SetText("Score: " + score);
+        if (Input.GetButtonDown("Cancel")) {
+            Application.Quit();
+        }
     }
 
     public void AddScore(int amount)
