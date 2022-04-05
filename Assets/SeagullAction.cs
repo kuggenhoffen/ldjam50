@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class SeagullAction : MonoBehaviour
 {
     public GameObject nestOn;
     public GameObject nestOff;
     public GameObject seagull;
     public Controller controller;
+    AudioSource audioSource;
     const float ACTION_COOLDOWN = 10f;
     float actionWaitTime = 0f;
     bool triggerActive = false;
@@ -18,6 +20,7 @@ public class SeagullAction : MonoBehaviour
         nestOff.SetActive(true);
         nestOn.SetActive(false);
         seagull.SetActive(false);
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -32,6 +35,7 @@ public class SeagullAction : MonoBehaviour
                 nestOff.SetActive(false);
                 nestOn.SetActive(true);
                 controller.AddScore(50);
+                audioSource.Play();
             }
         }
     }
