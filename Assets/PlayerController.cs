@@ -8,13 +8,19 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
+    enum JumpingState {
+        GROUNDED,
+        JUMPING,
+        NOT_GROUNDED
+    };
+
     const float moveSpeed = 3f;
     const float jumpVelocity = 6f;
     Rigidbody2D rb;
     SpriteRenderer sr;
     AudioSource audioSource;
-    bool grounded = false;
-    bool jumping = false;
+    bool grounded;
+    JumpingState jumpingState = JumpingState.NOT_GROUNDED;
     bool active = true;
     public Transform groundCheck;
     public Animator animator;
@@ -33,23 +39,40 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         float hVelocity = Mathf.Abs(rb.velocity.x);
-        animator.SetBool("Jumping", jumping);
+
+        switch (jumpingState) {
+            default:
+            case JumpingState.GROUNDED:
+                break;
+            case JumpingState.JUMPING:
+                if (!grounded) {
+                    jumpingState = JumpingState.NOT_GROUNDED;
+                }
+                break;
+            case JumpingState.NOT_GROUNDED:
+                if (grounded) {
+                    jumpingState = JumpingState.GROUNDED;
+                }
+                break;
+        }
+
+        animator.SetBool("Jumping", jumpingState != JumpingState.GROUNDED);
         animator.SetFloat("HorizontalVelocity", hVelocity);
-        
+
         if (!active) {
             return;
         }
 
         float horizontal = Input.GetAxis("Horizontal");
-        if (grounded) {
+        if (jumpingState == JumpingState.GROUNDED) {
             rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
             if (hVelocity > 0.1f && !audioSource.isPlaying) {
                 audioSource.PlayOneShot(stepSounds[Random.Range(0, stepSounds.Count)]);
             }
         }
 
-        if (grounded && !jumping && Input.GetButtonDown("Jump")) {
-            jumping = true;
+        if (jumpingState == JumpingState.GROUNDED && Input.GetButtonDown("Jump")) {
+            jumpingState = JumpingState.JUMPING;
             audioSource.PlayOneShot(jumpSounds[Random.Range(0, jumpSounds.Count)]);
         }
 
@@ -61,11 +84,8 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate() 
     {
         RaycastHit2D hit;
-        hit = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.15f, ~(1 << LayerMask.NameToLayer("Player")));
+        hit = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.1f, 1 << LayerMask.NameToLayer("Ground"));
         if (hit.collider != null) {
-            if (!grounded && jumping) {
-                jumping = false;
-            }
             grounded = true;
         }
         else {
@@ -76,7 +96,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnJumpEvent()
     {
-        if (jumping) {
+        if (jumpingState == JumpingState.JUMPING) {
             rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
         }
     }
