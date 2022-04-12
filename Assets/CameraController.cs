@@ -42,8 +42,7 @@ public class CameraController : MonoBehaviour
         if (leftBorder < maxLeft) {
             transform.position = new Vector3(transform.position.x + (maxLeft - leftBorder), transform.position.y, transform.position.z);
         }
-        if (rightBorder > maxRight) {          
-            Debug.Log(rightBorder + " : " + maxRight);  
+        if (rightBorder > maxRight) {
             transform.position = new Vector3(transform.position.x + (maxRight - rightBorder), transform.position.y, transform.position.z);
         }
 
